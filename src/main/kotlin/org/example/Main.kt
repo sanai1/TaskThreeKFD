@@ -62,7 +62,7 @@ fun async(company: Company) = runBlocking {
 fun main() = runBlocking {
     repeat(5) { i ->
         val pair = test()
-        println("test $i")
+        println("test ${i+1}")
         println("async ${pair.first}")
         println("ordinary - ${pair.second}")
         println()

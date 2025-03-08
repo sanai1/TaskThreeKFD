@@ -1,5 +1,6 @@
 package org.example
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -25,7 +26,7 @@ object AsyncDeserializer {
                 val args = constructor.parameters.associateWith { param ->
                     val fieldName = param.name
                     val fieldValue = jsonElement[fieldName]!!
-                    async {
+                    async(Dispatchers.Default) {
                         deserializeJsonElement(fieldValue, param.type)
                     }
                 }.mapValues { it.value.await() }
@@ -35,7 +36,7 @@ object AsyncDeserializer {
                 val elementType = type.arguments.firstOrNull()?.type
                     ?: throw IllegalArgumentException("List type must have a type argument")
                 val jobs = jsonElement.map { element ->
-                    async {
+                    async(Dispatchers.Default) {
                         deserializeJsonElement(element, elementType)
                     }
                 }

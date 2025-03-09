@@ -2,29 +2,20 @@ package org.example
 
 import com.google.gson.Gson
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import kotlin.reflect.full.memberProperties
-
-private const val BATCH_SIZE = 100
 
 suspend fun <T : Any> asyncSerializeObject(obj: T): String = coroutineScope {
     when (obj) {
         is List<*> -> {
-            val jsonList = obj
-                .asFlow()
-                .flatMapMerge(concurrency = BATCH_SIZE) { item ->
-                    flow {
-                        emit(
-                            if (item != null) {
-                                asyncSerializeObject(item)
-                            } else {
-                                "null"
-                            }
-                        )
+            val jsonList = obj.map { item ->
+                async(Dispatchers.Default) {
+                    if (item != null) {
+                        asyncSerializeObject(item)
+                    } else {
+                        "null"
                     }
                 }
-                .buffer(BATCH_SIZE)
-                .toList()
+            }.awaitAll()
             "[${jsonList.joinToString(",")}]"
         }
         is String, is Number, is Boolean -> Gson().toJson(obj)

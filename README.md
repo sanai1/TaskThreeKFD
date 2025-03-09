@@ -11,6 +11,7 @@
 ### Описание структуры данных для тестирования
 
 ```mermaid
+%%{init: {'theme': 'dark'}}%%
 classDiagram
     class User {
         +Int id
@@ -30,16 +31,22 @@ classDiagram
         +Int age
     }
     
-    User "1" *-- "1" Profile : содержит
-    Address "1" *-- "1" Profile : содержит
+    User "1" *-- "1" Profile
+    Address "1" *-- "1" Profile
     
     class Company {
         +String name
         +List~Profile~ employees
     }
     
-    Company "1" *-- "many" Profile : содержит
+    Company "1" *-- "many" Profile
+
+    style User fill:#e0e0e0,stroke:#333,stroke-width:2px,color:#000000
+    style Address fill:#e0e0e0,stroke:#333,stroke-width:2px,color:#000000
+    style Profile fill:#e0e0e0,stroke:#333,stroke-width:2px,color:#000000
+    style Company fill:#e0e0e0,stroke:#333,stroke-width:2px,color:#000000
 ```
+Объект который подлежал сериализации - `Company`
 
 ### Результаты
 

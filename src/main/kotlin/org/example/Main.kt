@@ -19,7 +19,7 @@ data class Company(val name: String, val employees: List<Profile>)
 fun test() = runBlocking {
     val repeat = 10000
     val users = List(repeat) {
-        User(it, "User${Random}", "user${Random}@example.com")
+        User(it, "User${Random.nextInt()}", "user${Random.nextInt()}@example.com")
     }
 
     val addresses = List(repeat) {
@@ -35,76 +35,46 @@ fun test() = runBlocking {
     return@runBlocking Pair(async(company), ordinary(company))
 }
 
-fun ordinary(company: Company): Int {
+fun ordinary(company: Company): Pair<Int, Int> {
     val startSerializerOrdinary = System.currentTimeMillis()
     val jsonStringOrdinary = serializeObject(company)
     val finishSerializerOrdinary = System.currentTimeMillis()
-//    return (finishSerializerOrdinary - startSerializerOrdinary).toInt()
 
     val startDeserializerOrdinary = System.currentTimeMillis()
     val deserializeCompanyOrdinary = Deserializer.deserialize(jsonStringOrdinary, Company::class)
     val finishDeserializerOrdinary = System.currentTimeMillis()
-    return (finishDeserializerOrdinary - startDeserializerOrdinary).toInt()
+//    println("company == deserializeCompanyOrdinary: ${company == deserializeCompanyOrdinary}")
+    return Pair(
+        (finishSerializerOrdinary - startSerializerOrdinary).toInt(),
+        (finishDeserializerOrdinary - startDeserializerOrdinary).toInt()
+    )
 }
 
 fun async(company: Company) = runBlocking {
     val startSerializer = System.currentTimeMillis()
     val json = asyncSerializeObject(company)
     val finishSerializer = System.currentTimeMillis()
-//    return@runBlocking (finishSerializer - startSerializer).toInt()
 
     val startDeserializer = System.currentTimeMillis()
     val deserializeCompany = AsyncDeserializer.deserializeAsync(json, Company::class)
     val finishDeserializer = System.currentTimeMillis()
-    return@runBlocking (finishDeserializer - startDeserializer).toInt()
+//    println("company == deserializeCompany: ${company == deserializeCompany}")
+    return@runBlocking Pair(
+        (finishSerializer - startSerializer).toInt(),
+        (finishDeserializer - startDeserializer).toInt()
+    )
 }
 
 fun main() = runBlocking {
     repeat(5) { i ->
         val pair = test()
-        println("test ${i+1}")
-        println("async ${pair.first}")
-        println("ordinary - ${pair.second}")
-        println()
+        println("test ${i+1}\n")
+        println("Serialize:")
+        println("async - ${pair.first.first}")
+        println("ordinary - ${pair.second.first}\n")
+        println("Deserialize:")
+        println("async - ${pair.first.second}")
+        println("ordinary - ${pair.second.second}")
+        println("-----------------------------------------")
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
